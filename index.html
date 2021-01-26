@@ -6,20 +6,27 @@
     <title>Teste</title>
 </head>
 <body>
-    <h1>Olá, Teste1!</h1>
+<h1>Olá, Teste1!</h1>
+
 
 <!-- SZ.chat - Código para o WebChat -->
 <script type="text/javascript">
-  (function(s, z, c, h, a, t) {
-    s.SZchat = s.SZchat || function() {
-      (s.SZchat.q = s.SZchat.q || []).push(arguments);
-    };
-    t = z.createElement(c),
-      a = z.getElementsByTagName(c)[0]; t.async = 1;
-    t.src = 'https://cdn.qa-webchat.sz.chat/szchat.js'; a.parentNode.insertBefore(t, a);
-    s.SZchat('cid', '600f3199c939681e0c664593');
-    s.SZchat('host', h);
-  })(window, document, 'script', 'https://inovations.sz.chat');
+    const url = new URL(window.location.href);
+    const rootHOST = url.searchParams.get("host") || url.origin;
+    const rootCID = url.searchParams.get("cid") || '';
+
+    (function (s, z, c, h, a, t) {
+        s.SZchat = s.SZchat || function () {
+            (s.SZchat.q = s.SZchat.q || []).push(arguments);
+        };
+        t = z.createElement(c),
+            a = z.getElementsByTagName(c)[0];
+        t.async = 1;
+        t.src = 'https://cdn.qa-webchat.sz.chat/szchat.js';
+        a.parentNode.insertBefore(t, a);
+        s.SZchat('cid', rootCID);
+        s.SZchat('host', h);
+    })(window, document, 'script', rootHOST);
 </script>
 </body>
 </html>
