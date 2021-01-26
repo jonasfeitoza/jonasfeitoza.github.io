@@ -10,17 +10,16 @@
 
 <!-- SZ.chat - Código para o WebChat -->
 <script type="text/javascript">
-  (function (s, z, c, h, a, t) {
-    s.SZchat = s.SZchat || function () {
+  (function(s, z, c, h, a, t) {
+    s.SZchat = s.SZchat || function() {
       (s.SZchat.q = s.SZchat.q || []).push(arguments);
     };
     t = z.createElement(c),
       a = z.getElementsByTagName(c)[0]; t.async = 1;
-    t.src = 'https://develop.sz.chat/webchat/v2/szchat.js'; a.parentNode.insertBefore(t, a);
-    s.SZchat('cid', '5fd8bdcff1d4f279ef5f0f93');
+    t.src = 'https://cdn.qa-webchat.sz.chat/szchat.js'; a.parentNode.insertBefore(t, a);
+    s.SZchat('cid', '600f3199c939681e0c664593');
     s.SZchat('host', h);
-    s.SZchat('debug', false);
-  })(window, document, 'script', 'https://develop.sz.chat');
+  })(window, document, 'script', 'https://inovations.sz.chat');
 </script>
 </body>
 </html>
