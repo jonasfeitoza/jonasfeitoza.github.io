@@ -1,33 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Webchat Debugger</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 </head>
 <body>
-<h1>Olá, Teste1!</h1>
+<div id="app" class="container my-5">
+    <div class="row">
+        <div class="col-md-12 col-lg-6">
+            <h1>Webchat Debugger</h1>
+            <form>
+                <div class="mb-3">
+                    <label for="host" class="form-label">Host Cliente</label>
+                    <input type="text" class="form-control" id="host" v-model="rootClientHOST">
+                </div>
+                <div class="mb-3">
+                    <label for="channelId" class="form-label">Id. Canal</label>
+                    <input type="text" class="form-control" id="channelId" v-model="rootCID" autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="szSrc" class="form-label">SZ_SRC</label>
+                    <input type="text" class="form-control" id="szSrc" aria-describedby="szSrcHelp" v-model="rootSZSRC">
+                    <div id="szSrcHelp" class="form-text">Local do arquivo szchat.js</div>
+                </div>
+                <div class="mb-3">
+                    <label for="basic-url" class="form-label">URL</label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control disabled" id="basic-url" :value="generatedUrl">
+                        <button class="btn btn-outline-primary" type="button" @click.prevent="copyToClipboard">Copiar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
-
-<!-- SZ.chat - Código para o WebChat -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js"
+        integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js"
+        integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <script type="text/javascript">
-    const url = new URL(window.location.href);
-    const rootHOST = url.searchParams.get("host") || url.origin;
-    const rootCID = url.searchParams.get("cid") || '';
-    const rootSZSRC = url.searchParams.get("sz_src") || 'https://cdn.qa-webchat.sz.chat/szchat.js';
+    let app = new Vue({
+        el: '#app',
+        data: {
+            rootHOST: null,
+            rootClientHOST: null,
+            rootCID: null,
+            rootSZSRC: null,
+        },
+        computed: {
+            generatedUrl() {
+                const queryData = new URLSearchParams({
+                    host: this.rootClientHOST,
+                    cid: this.rootCID,
+                    sz_src: this.rootSZSRC
+                });
 
-    (function (s, z, c, h, a, t) {
-        s.SZchat = s.SZchat || function () {
-            (s.SZchat.q = s.SZchat.q || []).push(arguments);
-        };
-        t = z.createElement(c),
-            a = z.getElementsByTagName(c)[0];
-        t.async = 1;
-        t.src = rootSZSRC;
-        a.parentNode.insertBefore(t, a);
-        s.SZchat('cid', rootCID);
-        s.SZchat('host', h);
-    })(window, document, 'script', rootHOST);
+                return `${this.rootHOST}?${queryData.toString()}`;
+            },
+        },
+        beforeMount() {
+            const url = new URL(window.location.href);
+
+            this.rootHOST = url.origin;
+            this.rootClientHOST = url.searchParams.get("host") || url.origin;
+            this.rootCID = url.searchParams.get("cid") || null;
+            this.rootSZSRC = url.searchParams.get("sz_src") || 'https://cdn.qa-webchat.sz.chat/szchat.js';
+
+            if (this.rootClientHOST !== null && this.rootCID !== null) {
+                const data = `
+                (function (s, z, c, h, a, t) {
+            s.SZchat = s.SZchat || function () {
+                (s.SZchat.q = s.SZchat.q || []).push(arguments);
+            };
+            t = z.createElement(c),
+                a = z.getElementsByTagName(c)[0];
+            t.async = 1;
+            t.src = '${this.rootSZSRC}';
+            a.parentNode.insertBefore(t, a);
+            s.SZchat('cid', '${this.rootCID}');
+            s.SZchat('host', h);
+        })(window, document, 'script', '${this.rootClientHOST}');
+                `;
+
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.async = true;
+                script.innerHTML = data;
+                document.body.appendChild(script);
+            }
+        },
+        methods: {
+            copyToClipboard() {
+                let copyText = document.getElementById("basic-url");
+                copyText.select();
+                copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+                document.execCommand("copy");
+            }
+        }
+    });
 </script>
 </body>
 </html>
